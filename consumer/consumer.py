@@ -1,16 +1,13 @@
-from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
+from aiokafka import AIOKafkaConsumer
 import asyncio
 import json
-from db import insert_data
-from flask import Flask, request, jsonify
+from db import get_connection
 import smtplib
 from email.message import EmailMessage
 
-app = Flask(__name__)
-
 # Configuración SMTP
-email_sender = "tu_correo@example.com"
-email_password = "tu_contraseña"
+email_sender = "leaguel255@gmail.com"
+email_password = "91213399.."
 
 # Configuración Kafka
 bootstrap_servers = 'kafka:9092'
@@ -23,9 +20,6 @@ consumer = AIOKafkaConsumer(
     bootstrap_servers=[bootstrap_servers],
     group_id=group_id
 )
-
-# Crear productor Kafka
-producer = AIOKafkaProducer(bootstrap_servers=[bootstrap_servers])
 
 # Enviar correo electrónico
 def send_mail(email_receiver, subject, body):
@@ -41,35 +35,32 @@ def send_mail(email_receiver, subject, body):
         smtp.send_message(mail)
         print("Email enviado con éxito")
 
-# Endpoint para recibir pedido (HTTP POST)
-@app.route('/solicitud', methods=['POST'])
-async def solicitar_pedido():
-    data = await request.get_json()
-    await producer.start()
-    try:
-        await producer.send_and_wait(topic, json.dumps(data).encode('utf-8'))
-    finally:
-        await producer.stop()
-    return jsonify({'mensaje': 'Pedido enviado correctamente'}), 200
-
-# Endpoint para obtener estado del pedido (HTTP GET)
-@app.route('/estado/<id_pedido>', methods=['GET'])
-async def obtener_estado(id_pedido):
+async def obtener_estado():
+    id_pedido = input("Ingrese el ID del pedido: ")
     await consumer.start()
     try:
         async for msg in consumer:
             datos = json.loads(msg.value)
             if datos['id'] == id_pedido:
+                estado = datos['estado']
                 subject = f"Estado del pedido {id_pedido}"
-                body = f"El estado del pedido {id_pedido} es: {datos['estado']}"
+                body = f"El estado del pedido {id_pedido} es: {estado}"
                 correo = datos['correo']
                 send_mail(correo, subject, body)
-                return jsonify(datos), 200
+                print(f"Estado del pedido {id_pedido}: {estado}")
+                return
     finally:
         await consumer.stop()
 
-    return jsonify({'mensaje': 'Pedido no encontrado'}), 404
+    print("Pedido no encontrado")
+
+async def main():
+    while True:
+        opcion = input("Ingrese 1 para obtener el estado de un pedido: ")
+        if opcion == '1':
+            await obtener_estado()
+        else:
+            print("Opción inválida")
 
 if __name__ == '__main__':
-    asyncio.run(consumer.start())
-    app.run(host='0.0.0.0', port=5000)
+    asyncio.run(main())
