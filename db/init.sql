@@ -7,7 +7,8 @@ CREATE TABLE Product (
     id SERIAL PRIMARY KEY,
     product VARCHAR(100),
     category BIGINT,
-    price FLOAT
+    price FLOAT,
+    correo VARCHAR(100)
 );
 
 COPY Product 
