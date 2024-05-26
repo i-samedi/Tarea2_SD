@@ -23,4 +23,15 @@ services:
     depends_on:
       - zookeeper
 
-      
+#-----------------POSTGRESQL------------------#  
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_HOST: localhost
+      POSTGRES_USER: tiago
+      POSTGRES_PASSWORD: tarea11
+      POSTGRES_DB: ikea
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
