@@ -15,5 +15,6 @@ FROM 'db/Productos_IKEA.csv'
 DELIMITER ';' 
 CSV HEADER;
 
+--\copy Product FROM 'C:\Users\FelipitoChiLL\Documents\GitHub\Tarea2_SD\db\amazon.csv' WITH (DELIMITER ';', FORMAT csv, HEADER true);
 -- CREATE ROLE tiago WITH LOGIN PASSWORD 'tarea11';
 -- GRANT ALL PRIVILEGES ON DATABASE tarea1 TO tiago;
