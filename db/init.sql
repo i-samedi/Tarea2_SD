@@ -5,7 +5,7 @@ CREATE DATABASE IKEA;
 -- crea la tabla
 CREATE TABLE Product (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
+    product VARCHAR(100),
     category BIGINT,
     price FLOAT
 );
