@@ -6,7 +6,7 @@ CREATE DATABASE IKEA;
 CREATE TABLE Product (
     id SERIAL PRIMARY KEY,
     product VARCHAR(100),
-    category BIGINT,
+    category VARCHAR(100),
     price FLOAT,
     correo VARCHAR(100)
 );
@@ -19,3 +19,4 @@ CSV HEADER;
 --\copy Product FROM 'C:\Users\FelipitoChiLL\Documents\GitHub\Tarea2_SD\db\amazon.csv' WITH (DELIMITER ';', FORMAT csv, HEADER true);
 -- CREATE ROLE tiago WITH LOGIN PASSWORD 'tarea11';
 -- GRANT ALL PRIVILEGES ON DATABASE tarea1 TO tiago;
+    
