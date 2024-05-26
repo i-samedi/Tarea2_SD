@@ -1,9 +1,9 @@
 import psycopg2
 
 # Configuración de la conexión a PostgreSQL
-postgres_host = "postgres_host"
+postgres_host = "localhost"
 postgres_port = 5432
-postgres_db = "IKEA"
+postgres_db = "ikea"
 postgres_user = "tiago"
 postgres_password = "tarea11"
 
