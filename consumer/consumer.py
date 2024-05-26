@@ -1,5 +1,7 @@
 from aiokafka import AIOKafkaConsumer
 import asyncio
+import json
+import psycopg2
 
 async def consume():
     consumer = AIOKafkaConsumer(

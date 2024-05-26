@@ -1,16 +1,17 @@
 -- crea la base de datos
-CREATE DATABASE Amazon;
+CREATE DATABASE IKEA;
 -- conecta a la base de datos
-\c Amazon;
+\c IKEA;
 -- crea la tabla
 CREATE TABLE Product (
-    products VARCHAR(100),
-    reviews BIGINT,
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    category BIGINT,
     price FLOAT
 );
 
 COPY Product 
-FROM 'db/amazon.csv' 
+FROM 'db/Productos_IKEA.csv' 
 DELIMITER ';' 
 CSV HEADER;
 
