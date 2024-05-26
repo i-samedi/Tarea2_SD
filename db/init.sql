@@ -1,7 +1,7 @@
 -- crea la base de datos
 CREATE DATABASE Amazon;
 -- conecta a la base de datos
-\c cars;
+\c Amazon;
 -- crea la tabla
 CREATE TABLE Product (
     products VARCHAR(100),
