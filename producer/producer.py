@@ -3,8 +3,10 @@ from aiokafka import AIOKafkaProducer
 import asyncio
 import requests
 import json
+import asyncpg
 
 
+#app = Flask(__name__)
 
 async def send_one():
     producer = AIOKafkaProducer(
@@ -16,3 +18,4 @@ async def send_one():
         await producer.stop()
 
 asyncio.run(send_one())
+

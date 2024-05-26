@@ -5,3 +5,4 @@ aiokafka
 requests
 lz4tools
 xxhash
+asyncpg
