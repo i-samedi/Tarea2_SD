@@ -1,115 +1,62 @@
-# from aiokafka import AIOKafkaConsumer
-# import asyncio
-# import json
-# import requests
-# import smtplib
-# from email.message import EmailMessage
-
-# # Configuración SMTP
-# email_sender = "leaguel255@gmail.com"
-# email_password = "91213399.."
-
-# # Configuración Apache Kafka
-# bootstrap_servers = 'kafka:9092'
-# topic = 'pedidos'
-# group_id = "pedidos-group"
-
-# # Enviar correo electrónico
-# def send_mail(email_receiver, subject, body):
-#     mail = EmailMessage()
-#     mail['From'] = email_sender
-#     mail['To'] = email_receiver
-#     mail['Subject'] = subject
-#     mail.set_content(body)
-
-#     with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
-#         smtp.starttls()
-#         smtp.login(email_sender, email_password)
-#         smtp.send_message(mail)
-#         print("Email enviado con éxito")
-
-# async def enviar_pedido():
-#     producto = input("Ingrese el producto: ")
-#     categoria = input("Ingrese la categoría: ")
-#     precio = float(input("Ingrese el precio: "))
-#     correo = input("Ingrese el correo electrónico: ")
-
-#     data = {
-#         'producto': producto,
-#         'categoria': categoria,
-#         'precio': precio,
-#         'correo': correo
-#     }
-
-#     # Enviar solicitud HTTP POST a Apache Kafka (simular productor)
-#     response = requests.post('http://kafka:9092/enviar_pedido', json=data)
-#     print(response.text)
-
-# async def obtener_estado():
-#     id_pedido = input("Ingrese el ID del pedido: ")
-
-#     # Enviar solicitud HTTP GET a Apache Kafka
-#     response = requests.get(f'http://kafka:9092/estado/{id_pedido}')
-#     datos = response.json()
-
-#     if 'estado' in datos:
-#         estado = datos['estado']
-#         subject = f"Estado del pedido {id_pedido}"
-#         body = f"El estado del pedido {id_pedido} es: {estado}"
-#         correo = datos['correo']
-#         send_mail(correo, subject, body)
-#         print(f"Estado del pedido {id_pedido}: {estado}")
-#     else:
-#         print("Pedido no encontrado")
-
-# async def main():
-#     while True:
-#         opcion = input("Ingrese 1 para enviar un pedido o 2 para obtener el estado de un pedido: ")
-#         if opcion == '1':
-#             await enviar_pedido()
-#         elif opcion == '2':
-#             await obtener_estado()
-#         else:
-#             print("Opción inválida")
-
-# if __name__ == '__main__':
-#     asyncio.run(main())
-
-from aiokafka import KafkaConsumer
 import json
-from db import get_db_connection
+import asyncio
+from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
+import asyncpg
+import aiosmtplib
+from email.message import EmailMessage
 
-# Configuración del Kafka Consumer
-consumer = KafkaConsumer(
-    'pedidos',
-    bootstrap_servers=['localhost:9092'],
-    auto_offset_reset='earliest',
-    enable_auto_commit=True,
-    group_id='procesamiento_group',
-    value_deserializer=lambda x: json.loads(x.decode('utf-8'))
-)
+DATABASE_URL = "postgresql://user:password@postgres/ikea"
+SMTP_SERVER = 'smtp.example.com'  # Reemplaza con tu servidor SMTP
+SMTP_PORT = 587
+SMTP_USERNAME = 'tu_usuario@example.com'  # Reemplaza con tu nombre de usuario SMTP
+SMTP_PASSWORD = 'tu_contraseña'  # Reemplaza con tu contraseña SMTP
 
-# Conexión a la base de datos PostgreSQL
-conn = get_db_connection()
-cursor = conn.cursor()
+ESTADOS = ["registrado", "procesando", "finalizado"]
+TIEMPO_DE_ESPERA = 5  # Tiempo en segundos
 
-# Función para procesar pedido
-def process_order(order):
-    cursor.execute(
-        """
-        INSERT INTO PEDIDOS (CLIENTEID, PRODUCTO, CATEGORIA, PRECIO, ESTADO)
-        VALUES (%s, %s, %s, %s, %s)
-        """,
-        (order['clienteid'], order['producto'], order['categoria'], order['precio'], 'recibido')
+async def get_db_connection():
+    return await asyncpg.connect(DATABASE_URL)
+
+async def send_email(to_email, subject, content):
+    message = EmailMessage()
+    message["From"] = SMTP_USERNAME
+    message["To"] = to_email
+    message["Subject"] = subject
+    message.set_content(content)
+    
+    await aiosmtplib.send(message, hostname=SMTP_SERVER, port=SMTP_PORT, username=SMTP_USERNAME, password=SMTP_PASSWORD, use_tls=False)
+
+async def main():
+    consumer = AIOKafkaConsumer(
+        'productos',
+        bootstrap_servers='kafka:9092',
+        group_id="procesamiento-group",
+        value_deserializer=lambda v: json.loads(v.decode('utf-8'))
     )
-    conn.commit()
-    print(f"Pedido procesado y almacenado: {order}")
+    producer = AIOKafkaProducer(
+        bootstrap_servers='kafka:9092',
+        value_serializer=lambda v: json.dumps(v).encode('utf-8')
+    )
 
-# Consumiendo mensajes de Kafka y procesándolos
-for message in consumer:
-    order = message.value
-    process_order(order)
+    await consumer.start()
+    await producer.start()
+    db = await get_db_connection()
 
-# Cerrar conexión
-cursor.close()
-conn.close()
+    try:
+        async for msg in consumer:
+            producto = msg.value
+            for estado in ESTADOS:
+                producto['estado'] = estado
+                query = "UPDATE Product SET estado = $1 WHERE id = $2"
+                await db.execute(query, estado, producto['id'])
+                await producer.send_and_wait("productos_procesados", producto)
+                await send_email(producto['correo'], f"Actualización de Producto (ID: {producto['id']})", f"Su producto ahora está en estado: {estado}")
+                await asyncio.sleep(TIEMPO_DE_ESPERA)
+    finally:
+        await consumer.stop()
+        await producer.stop()
+        await db.close()
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
