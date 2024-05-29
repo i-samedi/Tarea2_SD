@@ -1,4 +1,8 @@
-CREATE TABLE PRODUCTOS(
+CREATE DATABASE ikea;
+
+\c ikea
+
+CREATE TABLE productos(
     ID SERIAL PRIMARY KEY,
     PRODUCTO VARCHAR(100),
     CATEGORIA VARCHAR(100),
@@ -6,8 +10,8 @@ CREATE TABLE PRODUCTOS(
     CORREO VARCHAR(100)
 );
 
--- Importar datos de pedidos.csv a la tabla PEDIDOS
-COPY PRODUCTOS(ID, PRODUCTO, CATEGORIA, PRECIO, CORREO)
-FROM 'db/productos.csv'
-DELIMITER ','
+-- Importar datos de productos.csv a la tabla PRODUCTOS
+COPY productos(ID,PRODUCTO, CATEGORIA, PRECIO, CORREO)
+FROM '/docker-entrypoint-initdb.d/productos.csv'
+DELIMITER ';'
 CSV HEADER;

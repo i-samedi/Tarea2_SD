@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   postgres:
@@ -7,10 +7,11 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: ikea
+      POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/productos.csv:/docker-entrypoint-initdb.d/productos.csv
     ports:
       - "5432:5432"
 
@@ -57,6 +58,8 @@ services:
     depends_on:
       - postgres
       - kafka
+    ports:
+      - "8000:8000"
 
 volumes:
   postgres_data:

@@ -6,10 +6,10 @@ import aiosmtplib
 from email.message import EmailMessage
 
 DATABASE_URL = "postgresql://user:password@postgres/ikea"
-SMTP_SERVER = 'smtp.example.com'  # Reemplaza con tu servidor SMTP
+SMTP_SERVER = 'smtp.google.com'  # Reemplaza con tu servidor SMTP
 SMTP_PORT = 587
-SMTP_USERNAME = 'tu_usuario@example.com'  # Reemplaza con tu nombre de usuario SMTP
-SMTP_PASSWORD = 'tu_contraseña'  # Reemplaza con tu contraseña SMTP
+SMTP_USERNAME = 'leaguel255@gmail.com'  # Reemplaza con tu nombre de usuario SMTP
+SMTP_PASSWORD = '91213399..'  # Reemplaza con tu contraseña SMTP
 
 ESTADOS = ["registrado", "procesando", "finalizado"]
 TIEMPO_DE_ESPERA = 5  # Tiempo en segundos

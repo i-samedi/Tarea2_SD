@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from aiokafka import AIOKafkaProducer
 import asyncio
-import requests
+
 import json
 import asyncpg
 import aiosmtplib 
