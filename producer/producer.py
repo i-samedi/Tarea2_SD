@@ -11,11 +11,11 @@ from email.message import EmailMessage
 app = Flask(__name__)
 
 
-DATABASE_URL = ""
+DATABASE_URL = "postgresql://user:password@postgres/ikea"
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SMTP_USERNAME = "leaguel255@gmail.com"
-SMTP_PASSWORD = "password"
+SMTP_PASSWORD = "91213399.."
 
 
 

@@ -1,13 +1,13 @@
-CREATE TABLE CLIENTES(
+/* CREATE TABLE CLIENTES(
     ID SERIAL PRIMARY KEY,
     NOMBRE VARCHAR(255),
     APELLIDO VARCHAR(255),
     CORREO VARCHAR(255)
-);
+); */
 
 CREATE TABLE PRODUCTOS(
     ID SERIAL PRIMARY KEY,
-    CLIENTEID INT REFERENCES CLIENTES(CLIENTEID),
+-- CLIENTEID INT REFERENCES CLIENTES(CLIENTEID),
     PRODUCTO VARCHAR(100),
     CATEGORIA VARCHAR(100),
     PRECIO FLOAT,
@@ -25,11 +25,11 @@ CREATE TABLE PRODUCTOS(
 -- DELIMITER ','
 -- CSV HEADER;
 
--- -- Importar datos de pedidos.csv a la tabla PEDIDOS
--- COPY PEDIDOS(CLIENTEID, PRODUCTO, CATEGORIA, PRECIO, ESTADO)
--- FROM 'db/productos.csv'
--- DELIMITER ','
--- CSV HEADER;
+-- Importar datos de pedidos.csv a la tabla PEDIDOS
+COPY PRODUCTOS(ID, PRODUCTO, CATEGORIA, PRECIO, CORREO)
+FROM 'db/productos.csv'
+DELIMITER ','
+CSV HEADER;
 
 -- #-----------------PASO A PASO------------------#  
 -- docker ps  # Para listar todos los contenedores en funcionamiento y obtener el ID o nombre del contenedor PostgreSQL
