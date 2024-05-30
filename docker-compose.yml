@@ -1,65 +1,36 @@
-version: '3.9'
-
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    networks:
+      - app-network
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./db/productos.csv:/docker-entrypoint-initdb.d/productos.csv
-    ports:
-      - "5432:5432"
+      - ALLOW_ANONYMOUS_LOGIN=yes
 
   kafka:
-    image: confluentinc/cp-kafka:latest
-    container_name: kafka
-    ports:
-      - "9092:9092"
+    image: bitnami/kafka:latest
+    networks:
+      - app-network
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
 
   producer:
     build:
       context: ./producer
-    container_name: producer
-    environment:
-      DATABASE_URL: postgresql://user:password@postgres/ikea
-    depends_on:
-      - postgres
-      - kafka
-    ports:
-      - "5000:5000"
+      dockerfile: Dockerfile
+    networks:
+      - app-network
 
   consumer:
     build:
       context: ./consumer
-    container_name: consumer
-    environment:
-      DATABASE_URL: postgresql://user:password@postgres/ikea
-    depends_on:
-      - postgres
-      - kafka
-    ports:
-      - "8000:8000"
+      dockerfile: Dockerfile
+    networks:
+      - app-network
 
-volumes:
-  postgres_data:
+networks:
+  app-network:
+    driver: bridge
