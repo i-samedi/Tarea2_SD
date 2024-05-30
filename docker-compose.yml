@@ -14,7 +14,8 @@ services:
       - ./db/productos.csv:/docker-entrypoint-initdb.d/productos.csv
     ports:
       - "5432:5432"
-
+ 
+ 
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka
