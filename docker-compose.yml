@@ -21,6 +21,7 @@ services:
     build:
       context: ./producer
       dockerfile: Dockerfile
+    command: python /app/producer.py
     networks:
       - app-network
 
@@ -28,6 +29,7 @@ services:
     build:
       context: ./consumer
       dockerfile: Dockerfile
+    command: python /app/consumer.py
     networks:
       - app-network
 

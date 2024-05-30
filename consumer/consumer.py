@@ -1,4 +1,3 @@
-import json
 import asyncio
 from aiokafka import AIOKafkaConsumer
 import aiosmtplib
@@ -28,7 +27,7 @@ async def main():
                 'productos',
                 bootstrap_servers='kafka:9092',
                 group_id="procesamiento-group",
-                value_deserializer=lambda v: json.loads(v.decode('utf-8'))
+                value_deserializer=lambda v: v.decode('utf-8')
             )
             await consumer.start()
             break
@@ -38,10 +37,17 @@ async def main():
 
     try:
         async for msg in consumer:
-            producto = msg.value
+            producto_data = msg.value.split(',')
+            producto = {
+                'id': None,
+                'product': producto_data[0],
+                'category': producto_data[1],
+                'price': producto_data[2],
+                'correo': producto_data[3],
+            }
             for estado in ESTADOS:
                 producto['estado'] = estado
-                await send_email(producto['correo'], f"Actualización de Producto (ID: {producto['id']})", f"Su producto ahora está en estado: {estado}")
+                await send_email(producto['correo'], f"Actualización de Producto", f"Su producto {producto['product']} ahora está en estado: {estado}")
                 await asyncio.sleep(TIEMPO_DE_ESPERA)
     finally:
         await consumer.stop()
@@ -49,3 +55,4 @@ async def main():
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
+    loop.close()

@@ -1,4 +1,3 @@
-import json
 import asyncio
 from aiokafka import AIOKafkaProducer
 import aiosmtplib
@@ -18,30 +17,31 @@ async def send_email(to_email, subject, content):
 
     await aiosmtplib.send(message, hostname=SMTP_SERVER, port=SMTP_PORT, username=SMTP_USERNAME, password=SMTP_PASSWORD, use_tls=False)
 
-async def send_product(product):
+async def send_product(product_data):
     producer = AIOKafkaProducer(
         bootstrap_servers='kafka:9092',
-        value_serializer=lambda v: json.dumps(v).encode('utf-8')
+        value_serializer=lambda v: v.encode('utf-8')
     )
     await producer.start()
     try:
-        await producer.send_and_wait("productos", product)
-        await send_email(product['correo'], "Producto Registrado", f"Su producto {product['product']} ha sido registrado con éxito.")
+        await producer.send_and_wait("productos", product_data.encode('utf-8'))
+        await send_email(product_data.split(',')[3], "Producto Registrado", f"Su producto {product_data.split(',')[0]} ha sido registrado con éxito.")
     finally:
         await producer.stop()
 
-async def main():
+async def main_loop():
     while True:
         try:
-            product = input("Ingrese los detalles del producto (product, category, price, correo): ")
-            product_data = json.loads("{" + product + "}")
+            product = input("Ingrese el nombre del producto: ")
+            category = input("Ingrese la categoría del producto: ")
+            price = input("Ingrese el precio del producto: ")
+            correo = input("Ingrese el correo electrónico: ")
+            product_data = f"{product},{category},{price},{correo}"
             await send_product(product_data)
         except Exception as e:
-            if str(e) == "EOF when reading a line":
-                continue
-            else:
-                print(f"Error: {e}")
+            print(f"Error: {e}")
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    loop.run_until_complete(main_loop())
+    loop.close()
