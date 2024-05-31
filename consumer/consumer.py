@@ -18,8 +18,8 @@ async def send_email(to_email, subject, content):
     message["Subject"] = subject
     message.set_content(content)
 
-    await aiosmtplib.send(message, hostname=SMTP_SERVER, port=SMTP_PORT, username=SMTP_USERNAME, password=SMTP_PASSWORD, use_tls=False)
-
+    await aiosmtplib.send(message, hostname=SMTP_SERVER, port=SMTP_PORT, username=SMTP_USERNAME, password=SMTP_PASSWORD, use_tls=False, timeout=30)  # Aumenta el tiempo de espera a 30 segundos
+    
 async def main():
     while True:
         try:

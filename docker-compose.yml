@@ -21,15 +21,15 @@ services:
     build:
       context: ./producer
       dockerfile: Dockerfile
-    command: python /app/producer.py
     networks:
       - app-network
+    stdin_open: true
+    tty: true
 
   consumer:
     build:
       context: ./consumer
       dockerfile: Dockerfile
-    command: python /app/consumer.py
     networks:
       - app-network
 

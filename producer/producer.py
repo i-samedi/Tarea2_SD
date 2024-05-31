@@ -24,7 +24,7 @@ async def send_product(product_data):
     )
     await producer.start()
     try:
-        await producer.send_and_wait("productos", product_data.encode('utf-8'))
+        await producer.send_and_wait("productos", product_data)
         await send_email(product_data.split(',')[3], "Producto Registrado", f"Su producto {product_data.split(',')[0]} ha sido registrado con éxito.")
     finally:
         await producer.stop()
