@@ -1,4 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
-class Message(BaseModel):
-    message : str
+class Product(BaseModel):
+    name: str
+    price: float
+    email: EmailStr
+
+class ProductWithStatus(Product):
+    id: int
+    status: str
