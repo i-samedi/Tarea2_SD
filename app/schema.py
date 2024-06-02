@@ -8,3 +8,5 @@ class Product(BaseModel):
 class ProductWithStatus(Product):
     id: int
     status: str
+
+

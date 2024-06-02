@@ -8,5 +8,7 @@ loop = asyncio.get_event_loop()
 # Configuración SMTP
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-SMTP_USERNAME = 'leaguel255@gmail.com'  # Asegúrate de que este sea tu correo
-SMTP_PASSWORD = 'txme xbzp dykf xmjn'        # Asegúrate de que esta sea la contraseña correcta o una contraseña de aplicación
+SMTP_USERNAME = 'leaguel255@gmail.com'  
+SMTP_PASSWORD = 'txme xbzp dykf xmjn'       
+
+

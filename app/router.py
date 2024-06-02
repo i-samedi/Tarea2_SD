@@ -46,7 +46,7 @@ async def consume():
             )
 
             if new_status != "finalizado":
-                await asyncio.sleep(10)  # Tiempo de espera para simular el procesamiento
+                await asyncio.sleep(10) 
                 producer = AIOKafkaProducer(loop=loop, bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)
                 await producer.start()
                 try:

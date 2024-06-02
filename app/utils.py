@@ -20,3 +20,4 @@ def send_email(smtp_server, smtp_port, smtp_username, smtp_password, recipient, 
         print(f"Email sent to {recipient}")
     except Exception as e:
         print(f"Failed to send email: {e}")
+
